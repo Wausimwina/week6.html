@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Interactive JS Demo</title>
+<style>
+  body { font-family: Arial, sans-serif; padding: 20px; }
+  button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+  #hoverBox { width: 150px; height: 100px; background: lightgray; margin-bottom: 20px; transition: background-color 0.3s; }
+  #hoverBox:hover { background-color: lightblue; }
+  #slideshow { width: 300px; height: 200px; object-fit: cover; display: block; margin-bottom: 20px; }
+  .tab { display: inline-block; padding: 10px 20px; background: #eee; margin-right: 5px; cursor: pointer; border-radius: 5px 5px 0 0; }
+  .tab:hover { background: #ccc; }
+  .tab.active { background: #ddd; font-weight: bold; }
+  .tab-content { border: 1px solid #ddd; padding: 15px; border-radius: 0 5px 5px 5px; margin-top: -1px; }
+  #feedback { font-size: 0.9em; margin-top: 5px; }
+  .fade-in { animation: fadeIn 1s ease-in-out forwards; }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  form { max-width: 300px; margin-top: 30px; }
+  label { display: block; margin: 10px 0 5px; }
+  input { width: 100%; padding: 8px; box-sizing: border-box; }
+</style>
+</head>
+<body>
+
+<h1>Interactive JS Demo</h1>
+
+<!-- 1. Event Handling -->
+<section>
+  <h2>1. Event Handling 🎈</h2>
+  <button id="clickBtn">Click me!</button>
+  <div id="hoverBox">Hover over me</div>
+  <div id="secret" style="padding:10px; background:#eee; width:200px; cursor:pointer; user-select:none;">Double-click me!</div>
+  <div id="longPress" style="padding:10px; background:#eee; width:200px; margin-top:10px; cursor:pointer; user-select:none;">Press and hold me</div>
+</section>
+
+<hr />
+
+<!-- 2. Interactive Elements -->
+<section>
+  <h2>2. Interactive Elements 🎮</h2>
+  <button id="colorBtn">Change my text & color</button>
+
+  <img id="slideshow" src="https://picsum.photos/id/1018/300/200" alt="Slideshow" />
+
+  <div style="margin-top: 20px;">
+    <div class="tab active" data-tab="tab1">Tab 1</div>
+    <div class="tab" data-tab="tab2">Tab 2</div>
+    <div class="tab" data-tab="tab3">Tab 3</div>
+
+    <div id="tab1" class="tab-content fade-in">Content for Tab 1</div>
+    <div id="tab2" class="tab-content" style="display:none;">Content for Tab 2</div>
+    <div id="tab3" class="tab-content" style="display:none;">Content for Tab 3</div>
+  </div>
+</section>
+
+<hr />
+
+<!-- 3. Form Validation -->
+<section>
+  <h2>3. Form Validation 📋✅</h2>
+  <form id="signupForm" novalidate>
+    <label for="name">Name (required):</label>
+    <input type="text" id="name" name="name" required />
+
+    <label for="email">Email (required):</label>
+    <input type="email" id="email" name="email" required />
+
+    <label for="password">Password (min 8 chars):</label>
+    <input type="password" id="password" name="password" minlength="8" required />
+    <div id="feedback"></div>
+
+    <button type="submit" style="margin-top: 10px;">Submit</button>
+  </form>
+</section>
+
+<script>
+  // 1. Event Handling
+
+  // Button click
+  document.getElementById('clickBtn').addEventListener('click', () => {
+    alert('Button clicked!');
+  });
+
+  // Keypress detection
+  document.addEventListener('keydown', (e) => {
+    console.log(`You pressed: ${e.key}`);
+  });
+
+  // Double-click secret
+  document.getElementById('secret').addEventListener('dblclick', () => {
+    alert('Secret double-click action!');
+  });
+
+  // Long press detection
+  let pressTimer;
+  const longPressEl = document.getElementById('longPress');
+  longPressEl.addEventListener('mousedown', () => {
+    pressTimer = setTimeout(() => alert('Long press detected!'), 1000);
+  });
+  longPressEl.addEventListener('mouseup', () => clearTimeout(pressTimer));
+  longPressEl.addEventListener('mouseleave', () => clearTimeout(pressTimer));
+
+  // 2. Interactive Elements
+
+  // Button that changes text and color
+  const colorBtn = document.getElementById('colorBtn');
+  colorBtn.addEventListener('click', () => {
+    colorBtn.textContent = 'Clicked!';
+    colorBtn.style.backgroundColor = '#4CAF50';
+    colorBtn.style.color = 'white';
+  });
+
+  // Image slideshow
+  const images = [
+    'https://picsum.photos/id/1018/300/200',
+    'https://picsum.photos/id/1015/300/200',
+    'https://picsum.photos/id/1016/300/200'
+  ];
+  let currentIndex = 0;
+  const slideshowImg = document.getElementById('slideshow');
+
+  setInterval(() => {
+    currentIndex = (currentIndex + 1) % images.length;
+    slideshowImg.src = images[currentIndex];
+  }, 3000);
+
+  // Tabs logic
+  const tabs = document.querySelectorAll('.tab');
+  const tabContents = document.querySelectorAll('.tab-content');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      // Remove active class from all tabs and hide all content
+      tabs.forEach(t => t.classList.remove('active'));
+      tabContents.forEach(c => {
+        c.style.display = 'none';
+        c.classList.remove('fade-in');
+      });
+
+      // Activate clicked tab and show content
+      tab.classList.add('active');
+      const tabId = tab.getAttribute('data-tab');
+      const activeContent = document.getElementById(tabId);
+      activeContent.style.display = 'block';
+      activeContent.classList.add('fade-in');
+    });
+  });
+
+  // 3. Form Validation
+
+  const form = document.getElementById('signupForm');
+  const passwordInput = document.getElementById('password');
+  const feedback = document.getElementById('feedback');
+
+  // Real-time password feedback
+  passwordInput.addEventListener('input', () => {
+    if (passwordInput.value.length < 8) {
+      feedback.textContent = 'Password too short';
+      feedback.style.color = 'red';
+    } else {
+      feedback.textContent = 'Password looks good';
+      feedback.style.color = 'green';
+    }
+  });
+
+  // Custom form validation on submit
+  form.addEventListener('submit', (e) => {
+    if (!form.checkValidity()) {
+      e.preventDefault();
+      alert('Please fill out all required fields correctly.');
+    }
+  });
+</script>
+
+</body>
+</html>
